@@ -6,6 +6,7 @@ import numpy as np
 from vivarium.core.process import (
     Process, Deriver, Step)
 from vivarium.core.composer import Composer, MetaComposer, Composite
+from vivarium.core.control import run_library_cli
 from vivarium.core.types import State, Schema, Update, Topology
 from vivarium.processes.division import get_divide_update
 
@@ -907,11 +908,18 @@ class ToyDivider(Composer):
         }
 
 
+test_library = {
+    '1': test_composite_initial_state,
+    '2': test_composite_parameters,
+    '3': test_composite_merge,
+    '4': test_get_composite,
+    '5': test_aggregate_composer,
+    '6': test_override,
+    '7': test_composite_initial_state_complex,
+
+}
+
+
+# python vivarium/composites/toys.py -n [test number]
 if __name__ == '__main__':
-    test_composite_initial_state()  # pragma: no cover
-    test_composite_parameters()  # pragma: no cover
-    test_composite_merge()  # pragma: no cover
-    test_get_composite()  # pragma: no cover
-    test_aggregate_composer()  # pragma: no cover
-    test_override()  # pragma: no cover
-    test_composite_initial_state_complex()  # pragma: no cover
+    run_library_cli(test_library)
