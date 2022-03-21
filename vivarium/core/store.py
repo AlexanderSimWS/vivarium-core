@@ -1831,6 +1831,12 @@ class Store:
         if set(schema.keys()) & self.schema_keys:
             self.get_path(topology)._apply_config(schema)
         else:
+            for port in topology.keys():
+                if isinstance(port, tuple):
+                    import ipdb; ipdb.set_trace()
+                    pass
+
+
             mismatch_topology = (
                 set(topology.keys()) - set(schema.keys()))
             mismatch_schema = (
@@ -1867,6 +1873,11 @@ class Store:
                 elif isinstance(path, dict):
                     node, subpath = self.outer_path(
                         path, source=source)
+
+                    # if subpath.get(('*', 'external')):
+                    #     import ipdb;
+                    #     ipdb.set_trace()
+                    #     # TODO -- this is where the topology needs to rewire
 
                     node._topology_ports(
                         subschema,

@@ -823,6 +823,40 @@ def test_glob_schema() -> None:
     experiment_reverse.update(10)
 
 
+def test_glob_rewire() -> None:
+    agent_id = '0'
+    processes = {
+        'agents': {agent_id: {'transport': ToyTransport()}},
+        'environment': ToyEnvironment()}
+    topology = {
+        'environment': {
+            'agents': {
+                '_path': ('agents',),
+                ('*', 'external'): ('*', 'boundary', 'external'),
+                # '*': {
+                #     'external': ('external', 'GLC')
+                }
+        },
+        'agents': {
+            agent_id: {
+                'transport': {
+                    'internal': ('internal',),
+                    'external': ('boundary', 'external',)}}}}
+
+    # make the composite and run
+    composite = Composite({
+        'processes': processes,
+        'topology': topology,
+    })
+    experiment = Engine(
+        processes=composite.processes,
+        topology=composite.topology)
+    experiment.update(10)
+
+    import ipdb; ipdb.set_trace()
+
+
+
 def get_env_view_composite(agent_id: Any = '1') -> Composite:
     agent_composer = ToyDivider({
         'agent_id': agent_id,
@@ -1184,6 +1218,7 @@ engine_tests = {
     '11': test_custom_divider,
     '12': test_runtime_order,
     '13': test_glob_schema,
+    '13b': test_glob_rewire,
     '14': test_environment_view_with_division,
     '15': test_add_delete,
     '16': test_hyperdivision,
