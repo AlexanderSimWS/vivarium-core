@@ -399,6 +399,7 @@ def get_history_data_db(
         history_collection: Any,
         experiment_id: Any,
         query: list = None,
+        filters: Optional[dict] = None,
 ) -> Dict[float, dict]:
     """Query MongoDB for history data.
 
@@ -406,13 +407,19 @@ def get_history_data_db(
         history_collection: a MongoDB collection
         experiment_id: the experiment id which is being retrieved
         query: a list of tuples pointing to fields within the experiment data.
-            In the format: [('path', 'to', 'field1'), ('path', 'to', 'field2')]
+            In the format: [('path', 'to', 'field1'), ('path', 'to',
+            'field2')]. Note that this is really a "projection" not a
+            query.
+        filters: MongoDB query arguments to further filter results
+            beyond matching the experiment ID.
 
     Returns:
         data (dict)
     """
 
     experiment_query = {'experiment_id': experiment_id}
+    if filters:
+        experiment_query.update(filters)
 
     projection = None
     if query:
@@ -462,6 +469,7 @@ def data_from_database(
         experiment_id: str,
         client: Any,
         query: list = None,
+        filters: Optional[dict] = None,
 ) -> Tuple[dict, Any]:
     """Fetch something from a MongoDB."""
 
@@ -478,7 +486,7 @@ def data_from_database(
 
     # Retrieve timepoint data
     history = client.history
-    data = get_history_data_db(history, experiment_id, query)
+    data = get_history_data_db(history, experiment_id, query, filters)
 
     return data, experiment_config
 
