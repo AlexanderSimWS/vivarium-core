@@ -7,6 +7,7 @@ Engine runs the simulation.
 """
 
 import cProfile
+import gc
 import pstats
 import os
 import logging as log
@@ -885,13 +886,17 @@ class Engine:
                 update, store = self._calculate_update(
                     path, step, 0)
                 deferred_updates.append((update, store))
+                del step
 
             view_expire = False
             for update, store in deferred_updates:
                 view_expire_update = self.apply_update(update.get(), store)
                 view_expire = view_expire or view_expire_update
+                del update, store
 
             if view_expire:
+                del deferred_updates
+                gc.collect()
                 self.state.build_topology_views()
 
     def _send_updates(
@@ -910,8 +915,11 @@ class Engine:
             update, state = update_tuple
             view_expire_update = self.apply_update(update.get(), state)
             view_expire = view_expire or view_expire_update
+            del update_tuple, update, state
 
         if view_expire:
+            del update_tuples
+            gc.collect()
             self.state.build_topology_views()
 
         self.run_steps()
